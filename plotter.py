@@ -20,6 +20,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
+import re
 import sys
 
 parser = argparse.ArgumentParser(description='Plotter using matplotlib')
@@ -37,8 +38,21 @@ parser.add_argument('--png', action='store', dest='png', default=None,
         help='Save to png')
 parser.add_argument('--save', action='store', dest='save', default=None,
         help='Save to python file ')
+parser.add_argument('--col', '--using', '--u', action='store', dest='column', default='1:2',
+        help='Column to plot')
 
 args = parser.parse_args()
+p = re.compile(r'(\d+):(\d+)')
+digit = re.compile(r'\d+')
+if p.match(args.column):
+    cols = p.findall(args.column)
+    col1 = int(cols[0][0]) - 1
+    col2 = int(cols[0][1]) - 1
+elif digit.match(args.column):
+    cols = digit.findall(args.column)
+    col1 = 0
+    col2 = int(cols[0][0]) - 1
+
 # args.multi
 # args.m2d
 # args.pdf
@@ -66,7 +80,8 @@ else:
 
 for f in flist:
     data = np.loadtxt(f, comments=['@','#'])
-    plt.plot(data[:,0], data[:,1], label=f)
+    plt.plot(data[:,col1], data[:,col2], label=f)
+    # plt.plot(data[:,0], data[:,1], label=f)
 
 plt.legend(labelspacing=0.2, fancybox=True, fontsize=13)
 plt.grid(alpha=0.25)
